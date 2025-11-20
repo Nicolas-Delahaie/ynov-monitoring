@@ -1,6 +1,6 @@
 services:
   watchtower:
-    build: ./app
+    build: ./watchtower
     ports:
       - "8000:8000"
     environment:
