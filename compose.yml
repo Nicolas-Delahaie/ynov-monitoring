@@ -1,13 +1,11 @@
-version: '3.8'
-
 services:
   watchtower:
-    build: .
+    build: ./app
     ports:
       - "8000:8000"
     environment:
       - CCC_API_URL=https://api.ccc.bzctoons.net
-      - DATABASE_URL=postgresql://watchtower:password@postgres:5432/watchtower
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_USER}
       - REDIS_URL=redis://redis:6379
     depends_on:
       - postgres
@@ -15,44 +13,38 @@ services:
     restart: unless-stopped
 
   postgres:
-    image: postgres:15
+    image: postgres:latest
     environment:
-      - POSTGRES_USER=watchtower
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=watchtower
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+    restart: unless-stopped
 
   redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
+    image: redis:alpine
     volumes:
       - redis_data:/data
+    restart: unless-stopped
 
   prometheus:
     image: prom/prometheus:latest
-    ports:
-      - "9090:9090"
     volumes:
-      - ./dashboard/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
+    restart: unless-stopped
 
   grafana:
     image: grafana/grafana:latest
     ports:
       - "3000:3000"
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_PASSWORD
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./dashboard/grafana:/etc/grafana/provisioning/dashboards
+      - ./grafana/dashboard:/etc/grafana/provisioning/dashboards
     depends_on:
       - prometheus
+    restart: unless-stopped
 
 volumes:
   postgres_data:
