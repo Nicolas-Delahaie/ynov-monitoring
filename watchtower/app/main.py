@@ -5,9 +5,16 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from contextlib import asynccontextmanager
 import logging
 
+<<<<<<< Updated upstream:watchtower/main.py
 from watchtower.config import settings
 from watchtower.services.collector import GameplayCollector
 from watchtower.api import routes
+=======
+from app.config import settings
+from app.services.collector import GameplayCollector
+from app.api import routes
+from app.db import init_db, get_db  # Import de l'initialisation DB
+>>>>>>> Stashed changes:watchtower/app/main.py
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -18,28 +25,43 @@ scheduler = AsyncIOScheduler()
 async def scheduled_collection():
     """Collecte périodique des métriques"""
     logger.info("Starting scheduled metrics collection...")
-    metrics = await collector.collect_all_metrics()
-    logger.info(f"Collected metrics: {len(metrics)} categories")
+    try:
+        metrics = await collector.collect_all_metrics()
+        logger.info(f"Collected metrics: {len(metrics)} categories")
+    except Exception as e:
+        logger.error(f"Error during scheduled collection: {e}")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
     logger.info("Starting The Watchtower...")
+    
+    # Initialiser la base de données
+    logger.info("Initializing database...")
+    init_db()
+    logger.info("Database initialized successfully!")
+    
+    # Démarrer le scheduler
     scheduler.add_job(
         scheduled_collection,
         'interval',
         seconds=settings.METRICS_COLLECTION_INTERVAL
     )
     scheduler.start()
+    logger.info(f"Scheduler started (interval: {settings.METRICS_COLLECTION_INTERVAL}s)")
+    
     yield
+    
     # Shutdown
     logger.info("Shutting down The Watchtower...")
     scheduler.shutdown()
-    await collector.close()
+    # Fermer le client HTTP du collector
+    await collector.client.aclose()
+    logger.info("Shutdown complete")
 
 app = FastAPI(
-    title="The Watchtower",
-    description="Service de monitoring et d'alerting gameplay pour CCC",
+    title="The Watchtower - CCC Monitoring",
+    description="Monitoring and alerting system for Campus Clash Chronicles",
     version="1.0.0",
     lifespan=lifespan
 )
@@ -53,11 +75,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Instrumentation Prometheus
+# Prometheus instrumentation
 Instrumentator().instrument(app).expose(app)
 
 # Routes
-app.include_router(routes.router, prefix="/api/v1", tags=["metrics"])
+app.include_router(routes.router, prefix="/api", tags=["metrics"])
 
 @app.get("/")
 async def root():
@@ -68,5 +90,5 @@ async def root():
     }
 
 @app.get("/health")
-async def health_check():
+async def health():
     return {"status": "healthy"}
