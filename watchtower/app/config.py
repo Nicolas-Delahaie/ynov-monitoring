@@ -9,7 +9,6 @@ class Settings:
         self.CCC_API_URL = os.environ["CCC_API_URL"]
         self.CCC_API_KEY = None
         self.DATABASE_URL = os.environ["DATABASE_URL"]
-        self.REDIS_URL = os.environ["REDIS_URL"]
         # Integers
         try:
             self.METRICS_COLLECTION_INTERVAL = int(os.environ["METRICS_COLLECTION_INTERVAL"])
