@@ -5,16 +5,10 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from contextlib import asynccontextmanager
 import logging
 
-<<<<<<< Updated upstream:watchtower/main.py
-from watchtower.config import settings
-from watchtower.services.collector import GameplayCollector
-from watchtower.api import routes
-=======
 from app.config import settings
 from app.services.collector import GameplayCollector
 from app.api import routes
 from app.db import init_db, get_db  # Import de l'initialisation DB
->>>>>>> Stashed changes:watchtower/app/main.py
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
