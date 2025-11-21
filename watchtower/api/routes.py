@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from typing import List, Dict
 from datetime import datetime, timedelta
 
-from app.services.collector import GameplayCollector
-from app.models.metrics import MetricResponse, DashboardStats
+from watchtower.services.collector import GameplayCollector
+from watchtower.models.metrics import MetricResponse, DashboardStats
 
 router = APIRouter()
 collector = GameplayCollector()

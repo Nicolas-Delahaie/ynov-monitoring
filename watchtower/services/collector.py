@@ -3,7 +3,7 @@ from prometheus_client import Counter, Histogram, Gauge
 from datetime import datetime
 from typing import Dict, List
 import asyncio
-from app.config import settings
+from watchtower.config import settings
 import logging
 
 logger = logging.getLogger(__name__)

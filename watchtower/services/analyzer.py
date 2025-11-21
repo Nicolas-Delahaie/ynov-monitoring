@@ -1,7 +1,7 @@
 from typing import Dict, List
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
-from app.models.metrics import GameplayMetric, PlayerActivity, EventMetric
+from watchtower.models.metrics import GameplayMetric, PlayerActivity, EventMetric
 import logging
 
 logger = logging.getLogger(__name__)

@@ -7,6 +7,7 @@ services:
       - CCC_API_URL=https://api.ccc.bzctoons.net
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_USER}
       - REDIS_URL=redis://redis:6379
+      - METRICS_COLLECTION_INTERVAL=60
     depends_on:
       - postgres
       - redis

@@ -5,9 +5,9 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from contextlib import asynccontextmanager
 import logging
 
-from app.config import settings
-from app.services.collector import GameplayCollector
-from app.api import routes
+from watchtower.config import settings
+from watchtower.services.collector import GameplayCollector
+from watchtower.api import routes
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
