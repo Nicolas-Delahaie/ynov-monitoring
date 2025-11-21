@@ -7,13 +7,10 @@ services:
       - CCC_API_URL=https://api.ccc.bzctoons.net
       - CCC_API_KEY=
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
-      - REDIS_URL=redis://redis:6379
       - METRICS_COLLECTION_INTERVAL=60
     depends_on:
       postgres:
         condition: service_healthy
-      redis:
-        condition: service_started
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
@@ -36,18 +33,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
-
-  redis:
-    image: redis:7-alpine
-    command: redis-server --appendonly yes
-    volumes:
-      - redis_data:/data
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 3s
-      retries: 5
 
   prometheus:
     image: prom/prometheus:latest
@@ -74,7 +59,6 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD
       - GF_USERS_ALLOW_SIGN_UP=false
       - GF_SERVER_ROOT_URL=http://localhost:3000
-      - GF_INSTALL_PLUGINS=redis-datasource
     volumes:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning
@@ -85,6 +69,5 @@ services:
 
 volumes:
   postgres_data:
-  redis_data:
   prometheus_data:
   grafana_data:
