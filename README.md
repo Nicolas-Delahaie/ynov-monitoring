@@ -1,8 +1,8 @@
-# The Watchtower
+# Ynov Monitoring - The Watchtower
 
 ## Présentation
 
-Ce projet permet de monitorer et d’analyser le gameplay du service CCC via une API FastAPI, avec stockage des métriques, alerting, et visualisation via Prometheus et Grafana.
+Ce projet permet de monitorer et d’analyser le gameplay du service CCC via une API FastAPI, avec stockage des métriques, alerting, et visualisation via Prometheus et Grafana. Les métriques sont également publiées toutes les minutes sur un channel NATS pour intégration temps réel.
 
 ### Architecture
 
@@ -10,6 +10,8 @@ Ce projet permet de monitorer et d’analyser le gameplay du service CCC via une
 - **PostgreSQL** : stockage des données.
 - **Prometheus** : collecte et agrégation des métriques exposées par l’API.
 - **Grafana** : visualisation des dashboards et alertes.
+- **Redis** : cache et gestion des tâches.
+- **NATS** : publication des métriques en Pub/Sub (temps réel).
 
 ## Démarrage rapide
 
@@ -22,10 +24,13 @@ cd ynov-monitoring
 cp .env.example .env
 # Modifier .env selon vos besoins (API_KEY, DB, etc.)
 
-# 3. Lancer tous les services
+# 3. Installer les dépendances Python
+pip install -r watchtower/requirements.txt
+
+# 4. Lancer tous les services (incluant NATS)
 docker-compose up -d
 
-# 4. Vérifier le statut
+# 5. Vérifier le statut
 docker-compose ps
 ```
 
@@ -37,12 +42,14 @@ docker-compose ps
 | Docs API        | http://localhost:8000/docs | -                      |
 | Prometheus      | http://localhost:9090      | -                      |
 | Grafana         | http://localhost:3000      | admin / admin          |
+| NATS            | nats://localhost:4222      | -                      |
 
 ## Fonctionnement
 
 - L’API expose des endpoints pour récupérer les métriques gameplay, les stats globales, et l’état du service.
 - Les métriques sont collectées périodiquement et exposées à Prometheus.
 - Grafana permet de visualiser les dashboards et de configurer des alertes personnalisées.
+- **Toutes les minutes, les métriques sont publiées sur le channel NATS `metrics.watchtower` au format JSON.**
 
 ## Endpoints principaux
 
@@ -51,6 +58,11 @@ docker-compose ps
 - `GET /api/v1/metrics/resources` : ressources
 - `GET /api/v1/dashboard/stats` : stats globales
 - `GET /metrics` : métriques Prometheus
+
+## Utilisation de NATS
+
+- Les métriques sont publiées sur le channel `metrics.watchtower`.
+- Pour consommer les messages, utilisez un client NATS compatible 
 
 ## Dépannage
 

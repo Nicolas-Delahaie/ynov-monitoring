@@ -4,6 +4,8 @@ from prometheus_fastapi_instrumentator import Instrumentator
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from contextlib import asynccontextmanager
 import logging
+import json
+from nats.aio.client import Client as NATS
 
 from app.config import settings
 from app.services.collector import GameplayCollector
@@ -15,13 +17,18 @@ logger = logging.getLogger(__name__)
 
 collector = GameplayCollector()
 scheduler = AsyncIOScheduler()
+nats_client = NATS()
 
 async def scheduled_collection():
-    """Collecte périodique des métriques"""
+    """Collecte périodique des métriques et publication NATS"""
     logger.info("Starting scheduled metrics collection...")
     try:
         metrics = await collector.collect_all_metrics()
         logger.info(f"Collected metrics: {len(metrics)} categories")
+        # Publication sur NATS
+        if nats_client.is_connected:
+            await nats_client.publish("metrics.watchtower", json.dumps(metrics).encode())
+            logger.info("Metrics published to NATS on 'metrics.watchtower'")
     except Exception as e:
         logger.error(f"Error during scheduled collection: {e}")
 
@@ -34,6 +41,10 @@ async def lifespan(app: FastAPI):
     logger.info("Initializing database...")
     init_db()
     logger.info("Database initialized successfully!")
+    
+    # Connexion à NATS
+    await nats_client.connect(servers=["nats://nats:4222"])
+    logger.info("Connected to NATS server!")
     
     # Démarrer le scheduler
     scheduler.add_job(
@@ -51,6 +62,8 @@ async def lifespan(app: FastAPI):
     scheduler.shutdown()
     # Fermer le client HTTP du collector
     await collector.client.aclose()
+    if nats_client.is_connected:
+        await nats_client.close()
     logger.info("Shutdown complete")
 
 app = FastAPI(
