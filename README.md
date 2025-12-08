@@ -62,7 +62,50 @@ docker-compose ps
 ## Utilisation de NATS
 
 - Les métriques sont publiées sur le channel `metrics.watchtower`.
-- Pour consommer les messages, utilisez un client NATS compatible 
+- Pour consommer les messages, utilisez un client NATS compatible.
+
+### Exemple de message JSON envoyé sur NATS
+
+```json
+{
+  "nomads": {
+    "total_nomads": 42,
+    "by_action": {
+      "move": 120,
+      "attack": 15
+    },
+    "by_player": {
+      "player1": {"move": 10, "attack": 2},
+      "player2": {"move": 8, "attack": 1}
+    }
+  },
+  "resources": {
+    "total_gold": 5000,
+    "total_spice": 1200,
+    "by_player": {
+      "player1": {"gold": 300, "spice": 50},
+      "player2": {"gold": 250, "spice": 40}
+    }
+  },
+  "dwellings": {
+    "by_level": {"1": 10, "2": 5, "3": 2, "4": 1},
+    "total": 18
+  },
+  "pvp": {
+    "total_attacks": 20,
+    "successful_attacks": 15,
+    "destroyed_dwellings": 3
+  },
+  "events": {
+    "by_type": {
+      "tempete": {"count": 2, "affected_players": 5},
+      "raid": {"count": 1, "affected_players": 2}
+    },
+    "total": 3
+  },
+  "timestamp": "2025-12-08T12:34:56.789Z"
+}
+```
 
 ## Dépannage
 
