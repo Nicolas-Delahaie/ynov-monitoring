@@ -9,4 +9,4 @@ psycopg2-binary==2.9.9
 pydantic==2.5.2
 pydantic-settings==2.1.0
 apscheduler==3.10.4
-nats-py==2.3.0
+nats-py==2.10.0
