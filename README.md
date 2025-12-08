@@ -1,34 +1,62 @@
-## Démarrage et Utilisation
+# The Watchtower
+
+## Présentation
+
+Ce projet permet de monitorer et d’analyser le gameplay du service CCC via une API FastAPI, avec stockage des métriques, alerting, et visualisation via Prometheus et Grafana.
+
+### Architecture
+
+- **Watchtower (API FastAPI)** : collecte et expose les métriques gameplay.
+- **PostgreSQL** : stockage des données.
+- **Prometheus** : collecte et agrégation des métriques exposées par l’API.
+- **Grafana** : visualisation des dashboards et alertes.
+
+## Démarrage rapide
 
 ```bash
-# Installation des dépendances
-pip install -r requirements.txt
+# 1. Cloner le projet
+git clone <repo-url>
+cd ynov-monitoring
 
-# Configuration
+# 2. Configurer les variables d'environnement
 cp .env.example .env
-# Éditer .env avec vos paramètres
+# Modifier .env selon vos besoins (API_KEY, DB, etc.)
 
-# Démarrage avec Docker
+# 3. Lancer tous les services
 docker-compose up -d
 
-# Ou démarrage local
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+# 4. Vérifier le statut
+docker-compose ps
 ```
 
-# Accès aux Services
+## Accès aux services
 
-## API Watchtower
-- **URL** : http://localhost:8000
+| Service         | URL                        | Identifiants par défaut |
+|-----------------|----------------------------|------------------------|
+| API Watchtower  | http://localhost:8000      | -                      |
+| Docs API        | http://localhost:8000/docs | -                      |
+| Prometheus      | http://localhost:9090      | -                      |
+| Grafana         | http://localhost:3000      | admin / admin          |
 
-## Documentation API
-- **URL** : http://localhost:8000/docs
+## Fonctionnement
 
-## Métriques Prometheus
-- **URL** : http://localhost:8000/metrics
+- L’API expose des endpoints pour récupérer les métriques gameplay, les stats globales, et l’état du service.
+- Les métriques sont collectées périodiquement et exposées à Prometheus.
+- Grafana permet de visualiser les dashboards et de configurer des alertes personnalisées.
 
-## Prometheus UI
-- **URL** : http://localhost:9090
+## Endpoints principaux
 
-## Grafana Dashboard
-- **URL** : http://localhost:3000
-- **Identifiants** : `admin` / `admin`
+- `GET /api/v1/metrics/current` : toutes les métriques gameplay
+- `GET /api/v1/metrics/nomads` : métriques Nomads
+- `GET /api/v1/metrics/resources` : ressources
+- `GET /api/v1/dashboard/stats` : stats globales
+- `GET /metrics` : métriques Prometheus
+
+## Dépannage
+
+- Pour voir les logs d’un service :  
+  `docker-compose logs <service>`
+- Pour redémarrer un service :  
+  `docker-compose restart <service>`
+- Pour réinitialiser Grafana :  
+  `docker-compose down && docker volume rm ynov-monitoring_grafana_data && docker-compose up -d`
