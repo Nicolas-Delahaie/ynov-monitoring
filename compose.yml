@@ -5,8 +5,8 @@ services:
       - "8000:8000"
     environment:
       - CCC_API_URL=https://api.ccc.bzctoons.net
-      - CCC_API_KEY=
-      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      - CCC_API_KEY
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_USER}
       - METRICS_COLLECTION_INTERVAL=60
     depends_on:
       postgres:
@@ -20,7 +20,7 @@ services:
       start_period: 40s
 
   postgres:
-    image: postgres:15-alpine
+    image: postgres:alpine
     environment:
       - POSTGRES_USER
       - POSTGRES_PASSWORD
@@ -55,10 +55,9 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD
+      - GF_SECURITY_USER
+      - GF_SECURITY_PASSWORD
       - GF_USERS_ALLOW_SIGN_UP=false
-      - GF_SERVER_ROOT_URL=http://localhost:3000
     volumes:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning
@@ -68,9 +67,7 @@ services:
     restart: unless-stopped
 
   nats:
-    image: nats:2.10-alpine
-    ports:
-      - "4222:4222"
+    image: nats:alpine
     restart: unless-stopped
 
 volumes:
