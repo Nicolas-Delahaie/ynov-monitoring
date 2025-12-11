@@ -19,19 +19,6 @@ collector = GameplayCollector()
 scheduler = AsyncIOScheduler()
 nats_client = NATS()
 
-async def scheduled_collection():
-    """Collecte périodique des métriques et publication NATS"""
-    logger.info("Starting scheduled metrics collection...")
-    try:
-        metrics = await collector.collect_all_metrics()
-        logger.info(f"Collected metrics: {len(metrics)} categories")
-        # Publication sur NATS
-        if nats_client.is_connected:
-            await nats_client.publish("ccc.metrics.watchtower", json.dumps(metrics).encode())
-            logger.info("Metrics published to NATS on 'ccc.metrics.watchtower'")
-    except Exception as e:
-        logger.error(f"Error during scheduled collection: {e}")
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
