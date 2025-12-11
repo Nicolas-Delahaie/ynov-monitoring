@@ -1,0 +1,36 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'watchtower-monitor'
+
+scrape_configs:
+  # Prometheus lui-même
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # API Watchtower
+  - job_name: 'watchtower'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['watchtower:8000']
+        labels:
+          service: 'watchtower-api'
+          environment: 'production'
+    scrape_interval: 10s
+    scrape_timeout: 5s
+
+  # Métriques custom CCC
+  - job_name: 'ccc_gameplay'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['watchtower:8000']
+        labels:
+          service: 'ccc-game'
+          environment: 'production'
+    metric_relabel_configs:
+      # Garder seulement les métriques CCC
+      - source_labels: [__name__]
+        regex: 'ccc_.*'
+        action: keep
