@@ -1,5 +1,7 @@
 # The Watchtower
 
+Liens utiles : https://arc.net/folder/2B2CB738-5A33-40D8-999E-A13ADC1B016C
+
 ## Présentation
 
 Ce projet permet de monitorer et d’analyser le gameplay du service CCC via une API FastAPI, avec stockage des métriques, alerting, et visualisation via Prometheus et Grafana. Les métriques sont également publiées toutes les minutes sur un channel NATS pour intégration temps réel.
