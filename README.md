@@ -15,21 +15,13 @@ Ce projet permet de monitorer et d’analyser le gameplay du service CCC via une
 ## Démarrage rapide
 
 ```bash
-# 1. Cloner le projet
-git clone <repo-url>
-cd ynov-monitoring
-
-# 2. Configurer les variables d'environnement
+# Modifier .env selon vos besoins à partir du template
 cp .env.example .env
-# Modifier .env selon vos besoins (API_KEY, DB, etc.)
 
-# 3. Installer les dépendances Python
-pip install -r watchtower/requirements.txt
+# Lancer tous les services
+docker-compose up -d --build --wait
 
-# 4. Lancer tous les services (incluant NATS)
-docker-compose up -d
-
-# 5. Vérifier le statut
+# Vérifier le statut
 docker-compose ps
 ```
 
@@ -39,9 +31,7 @@ docker-compose ps
 |-----------------|-----------------------------------------|------------------------|
 | API Watchtower  | http://localhost:8000                   | -                      |
 | Docs API        | http://localhost:8000/docs              | -                      |
-| Prometheus      | http://localhost:9090                   | -                      |
 | Grafana         | http://localhost:3000                   | admin / admin          |
-| NATS            | wss://api.ccc.bzctoons.net/nats-ws      | -                      |
 
 ## Fonctionnement
 
