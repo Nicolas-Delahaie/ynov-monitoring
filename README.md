@@ -35,13 +35,13 @@ docker-compose ps
 
 ## Accès aux services
 
-| Service         | URL                        | Identifiants par défaut |
-|-----------------|----------------------------|------------------------|
-| API Watchtower  | http://localhost:8000      | -                      |
-| Docs API        | http://localhost:8000/docs | -                      |
-| Prometheus      | http://localhost:9090      | -                      |
-| Grafana         | http://localhost:3000      | admin / admin          |
-| NATS            | nats://localhost:4222      | -                      |
+| Service         | URL                                     | Identifiants par défaut |
+|-----------------|-----------------------------------------|------------------------|
+| API Watchtower  | http://localhost:8000                   | -                      |
+| Docs API        | http://localhost:8000/docs              | -                      |
+| Prometheus      | http://localhost:9090                   | -                      |
+| Grafana         | http://localhost:3000                   | admin / admin          |
+| NATS            | wss://api.ccc.bzctoons.net/nats-ws      | -                      |
 
 ## Fonctionnement
 
