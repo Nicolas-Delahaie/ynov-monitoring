@@ -44,7 +44,3 @@ jobs:
             echo "Exposed services :"
             docker compose ps
           EOF
-
-      - name: Cleanup SSH Key
-        if: always()
-        run: rm -f ~/.ssh/id_rsa
