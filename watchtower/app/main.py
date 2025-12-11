@@ -87,7 +87,7 @@ async def root():
 
 @app.get("/health")
 async def health():
-    return {"status": "healthy"}
+    return {"status": "Enormement healthy"}
 
 # Injection automatique des métriques mock au démarrage (dev/demo)
 inject_mock_metrics()
