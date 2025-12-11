@@ -43,7 +43,7 @@ async def lifespan(app: FastAPI):
     logger.info("Database initialized successfully!")
     
     # Connexion à NATS
-    await nats_client.connect(servers=["nats://nats:4222"])
+    await nats_client.connect(servers=["wss://api.ccc.bzctoons.net/nats-ws"])
     logger.info("Connected to NATS server!")
     
     # Démarrer le scheduler
