@@ -5,6 +5,9 @@ on:
       - deploy
   workflow_dispatch:
 
+# permissions:
+#   contents: write
+
 jobs:
   deploy_production:
     runs-on: ubuntu-latest
