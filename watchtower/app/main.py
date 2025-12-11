@@ -27,8 +27,8 @@ async def scheduled_collection():
         logger.info(f"Collected metrics: {len(metrics)} categories")
         # Publication sur NATS
         if nats_client.is_connected:
-            await nats_client.publish("metrics.watchtower", json.dumps(metrics).encode())
-            logger.info("Metrics published to NATS on 'metrics.watchtower'")
+            await nats_client.publish("ccc.metrics.watchtower", json.dumps(metrics).encode())
+            logger.info("Metrics published to NATS on 'ccc.metrics.watchtower'")
     except Exception as e:
         logger.error(f"Error during scheduled collection: {e}")
 

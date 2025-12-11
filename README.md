@@ -10,7 +10,6 @@ Ce projet permet de monitorer et d’analyser le gameplay du service CCC via une
 - **PostgreSQL** : stockage des données.
 - **Prometheus** : collecte et agrégation des métriques exposées par l’API.
 - **Grafana** : visualisation des dashboards et alertes.
-- **Redis** : cache et gestion des tâches.
 - **NATS** : publication des métriques en Pub/Sub (temps réel).
 
 ## Démarrage rapide
@@ -49,7 +48,7 @@ docker-compose ps
 - L’API expose des endpoints pour récupérer les métriques gameplay, les stats globales, et l’état du service.
 - Les métriques sont collectées périodiquement et exposées à Prometheus.
 - Grafana permet de visualiser les dashboards et de configurer des alertes personnalisées.
-- **Toutes les minutes, les métriques sont publiées sur le channel NATS `metrics.watchtower` au format JSON.**
+- **Toutes les minutes, les métriques sont publiées sur le channel NATS `ccc.metrics.watchtower` au format JSON.**
 
 ## Endpoints principaux
 
@@ -61,7 +60,7 @@ docker-compose ps
 
 ## Utilisation de NATS
 
-- Les métriques sont publiées sur le channel `metrics.watchtower`.
+- Les métriques sont publiées sur le channel `ccc.metrics.watchtower`.
 - Pour consommer les messages, utilisez un client NATS compatible.
 
 ### Exemple de message JSON envoyé sur NATS
