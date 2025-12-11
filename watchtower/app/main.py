@@ -39,7 +39,7 @@ async def lifespan(app: FastAPI):
 
     # Démarrer le scheduler
     scheduler.add_job(
-        scheduled_collection,
+        lambda: asyncio.create_task(nomad_stats_service.scheduled_collection()),
         'interval',
         seconds=settings.METRICS_COLLECTION_INTERVAL
     )
