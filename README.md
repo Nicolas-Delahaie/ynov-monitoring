@@ -93,3 +93,17 @@ docker-compose ps
   `docker-compose restart <service>`
 - Pour réinitialiser Grafana :  
   `docker-compose down && docker volume rm ynov-monitoring_grafana_data && docker-compose up -d`
+
+## Cycle d'exécution
+
+T=0s:   Scheduler déclenche collect_all_metrics()
+        ↓
+T=0.5s: Collector appelle l'API CCC (GET /nomads, /resources, etc.)
+        ↓
+T=1s:   Enregistre en DB + incrémente métriques Prometheus
+        ↓
+T=15s:  Prometheus scrape GET /metrics → récupère les chiffres
+        ↓
+T=30s:  Grafana requête Prometheus → affiche graphiques
+        ↓
+T=60s:  Boucle recommence

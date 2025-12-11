@@ -3,7 +3,7 @@ from typing import List, Dict
 from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 
-from app.services.collector import GameplayCollector
+from app.services.collector import GameplayCollector, inject_mock_metrics
 from app.services.analyzer import MetricsAnalyzer
 from app.models.metrics import MetricResponse, DashboardStats
 from app.db import get_db
@@ -140,3 +140,9 @@ async def trigger_collection():
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Collection failed: {str(e)}")
+
+@router.post("/inject-mock")
+async def inject_mock():
+    """Injecte des métriques Prometheus fictives pour le dashboard (dev/demo)."""
+    inject_mock_metrics()
+    return {"status": "ok", "message": "Mock metrics injected"}
