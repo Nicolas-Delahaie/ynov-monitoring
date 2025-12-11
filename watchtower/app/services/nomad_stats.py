@@ -3,8 +3,30 @@ from datetime import datetime, timedelta
 import httpx
 from typing import List
 import json
+import logging
+import asyncio
+from nats.aio.client import Client as NATS
+
 
 class NomadStatsService:
+    _nats_client = None
+    _nats_connected = False
+    _nats_url = "wss://api.ccc.bzctoons.net/nats-ws"
+    logger = logging.getLogger(__name__)
+
+    async def connect_nats(self):
+        if not self._nats_client:
+            self._nats_client = NATS()
+        if not self._nats_connected:
+            await self._nats_client.connect(servers=[self._nats_url])
+            self._nats_connected = True
+            self.logger.info("NATS client connected (NomadStatsService)")
+
+    async def close_nats(self):
+        if self._nats_client and self._nats_connected:
+            await self._nats_client.close()
+            self._nats_connected = False
+            self.logger.info("NATS client closed (NomadStatsService)")
 
     def get_mock_daily_login_counts(self, period_days: int = 7) -> Dict[str, int]:
         """
@@ -82,7 +104,7 @@ class NomadStatsService:
         n = max(1, int(len(above_avg) * 0.05))
         return [user_id for user_id, _ in above_avg[:n]]
 
-    async def send_suspect_move_ids_nats(self, nats_client, user_ids: List[str]):
+    async def send_suspect_move_ids_nats(self, user_ids: List[str]):
         """
         Envoie les IDs des joueurs suspects via NATS avec le commentaire demandé.
         """
@@ -90,9 +112,10 @@ class NomadStatsService:
             "suspect_ids": user_ids,
             "comment": "nombre de déplacements suspects"
         }
-        if nats_client.is_connected:
-            await nats_client.publish("ccc.watchtower.suspect_moves", json.dumps(message).encode())
-        logger.info(f"Sent suspect moves IDs via NATS: {message}")
+        await self.connect_nats()
+        if self._nats_client.is_connected:
+            await self._nats_client.publish("ccc.watchtower.suspect_moves", json.dumps(message).encode())
+        self.logger.info(f"Sent suspect moves IDs via NATS: {message}")
 
 
     def get_mock_nomads_created_per_user(self, user_ids: List[str]) -> Dict[str, int]:
@@ -119,7 +142,7 @@ class NomadStatsService:
         n = max(1, int(len(above_avg) * 0.05))
         return [user_id for user_id, _ in above_avg[:n]]
 
-    async def send_suspect_created_ids_nats(self, nats_client, user_ids: List[str]):
+    async def send_suspect_created_ids_nats(self, user_ids: List[str]):
         """
         Envoie les IDs des joueurs suspects via NATS avec le commentaire pour créations.
         """
@@ -127,9 +150,10 @@ class NomadStatsService:
             "suspect_ids": user_ids,
             "comment": "nombre de créations de nomads suspects"
         }
-        if nats_client.is_connected:
-            await nats_client.publish("ccc.watchtower.suspect_nomads_created", json.dumps(message).encode())
-        logger.info(f"Sent suspect created IDs via NATS: {message}")
+        await self.connect_nats()
+        if self._nats_client.is_connected:
+            await self._nats_client.publish("ccc.watchtower.suspect_nomads_created", json.dumps(message).encode())
+        self.logger.info(f"Sent suspect created IDs via NATS: {message}")
 
     def get_suspect_moves_json(self, user_ids: List[str]) -> Dict:
         """
