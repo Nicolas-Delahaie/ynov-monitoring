@@ -34,6 +34,8 @@ jobs:
 
             git pull origin deploy
 
+            git switch deploy
+
             docker compose up -d --remove-orphans --wait
 
             echo "Exposed services :"
