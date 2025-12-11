@@ -48,7 +48,7 @@ docker-compose ps
 - L’API expose des endpoints pour récupérer les métriques gameplay, les stats globales, et l’état du service.
 - Les métriques sont collectées périodiquement et exposées à Prometheus.
 - Grafana permet de visualiser les dashboards et de configurer des alertes personnalisées.
-- **Toutes les minutes, les métriques sont publiées sur le channel NATS `ccc.metrics.watchtower` au format JSON.**
+- **Toutes les minutes, les métriques sont publiées sur le channel NATS `ccc.watchtower` au format JSON.**
 
 ## Endpoints principaux
 
