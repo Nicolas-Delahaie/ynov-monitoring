@@ -32,9 +32,9 @@ jobs:
             set -e
             cd /root/ynov-monitoring
 
-            git pull origin deploy
-
             git switch deploy
+
+            git pull
 
             docker compose up -d --build --remove-orphans --wait
 
