@@ -2,7 +2,7 @@ services:
   watchtower:
     build: ./watchtower
     ports:
-      - "8000:8000"
+      - 8000:8000
     environment:
       - CCC_API_URL=https://api.ccc.bzctoons.net
       - CCC_API_KEY
@@ -53,10 +53,10 @@ services:
   grafana:
     image: grafana/grafana:latest
     ports:
-      - "3000:3000"
+      - 3000:3000
     environment:
-      - GF_SECURITY_USER
-      - GF_SECURITY_PASSWORD
+      - GF_SECURITY_ADMIN_USER
+      - GF_SECURITY_ADMIN_PASSWORD
       - GF_USERS_ALLOW_SIGN_UP=false
     volumes:
       - grafana_data:/var/lib/grafana
@@ -74,3 +74,4 @@ volumes:
   postgres_data:
   prometheus_data:
   grafana_data:
+
