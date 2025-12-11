@@ -8,7 +8,7 @@ import json
 
 
 from app.config import settings
-from app.services.collector import GameplayCollector
+from app.services.collector import GameplayCollector, inject_mock_metrics
 from app.api import routes
 from app.db import init_db, get_db  # Import de l'initialisation DB
 
@@ -17,7 +17,6 @@ logger = logging.getLogger(__name__)
 
 collector = GameplayCollector()
 scheduler = AsyncIOScheduler()
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -63,6 +62,9 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+# Prometheus instrumentation (doit être après la création de l'app)
+Instrumentator().instrument(app).expose(app)
+
 # CORS
 app.add_middleware(
     CORSMiddleware,
@@ -71,9 +73,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Prometheus instrumentation
-Instrumentator().instrument(app).expose(app)
 
 # Routes
 app.include_router(routes.router, prefix="/api", tags=["metrics"])
@@ -89,3 +88,6 @@ async def root():
 @app.get("/health")
 async def health():
     return {"status": "healthy"}
+
+# Injection automatique des métriques mock au démarrage (dev/demo)
+inject_mock_metrics()

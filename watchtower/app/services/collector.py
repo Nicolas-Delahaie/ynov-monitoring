@@ -1,10 +1,12 @@
 import httpx
 from prometheus_client import Counter, Histogram, Gauge
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 import asyncio
 from app.config import settings
 import logging
+import os
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -259,3 +261,40 @@ class GameplayCollector:
         except Exception as e:
             logger.error(f"Critical error in collect_all_metrics: {e}")
             return {"status": "error", "message": str(e)}
+
+            
+def inject_mock_metrics():
+    """
+    Injecte des métriques Prometheus fictives pour le dashboard Grafana (dev/demo), réparties depuis 9h ce matin.
+    """
+    now = datetime.utcnow()
+    # Heure de début : aujourd'hui 9h UTC
+    start = now.replace(hour=9, minute=0, second=0, microsecond=0)
+    if start > now:
+        start -= timedelta(days=1)
+    # Génère des points toutes les 20 minutes
+    points = int(((now - start).total_seconds()) // (20 * 60))
+    for i in range(points):
+        # t = start + timedelta(minutes=20 * i)
+        # ts = time.mktime(t.timetuple())
+        # 3 types d'actions, 7 users
+        for a in range(3):
+            for u in range(7):
+                nomad_actions.labels(action_type=f"move_{a}", player_id=f"user_{u}").inc(5 + (a + u + i) % 10)
+    for i in range(5):
+        resource_collected.labels(resource_type=f"gold_{i%2}", player_id=f"user_{i%3}").inc(10 + i)
+    for i in range(3):
+        dwelling_levels.labels(player_id=f"user_{i}").set(1 + i)
+    active_nomads.labels(player_id='all').set(7)
+    for i in range(4):
+        pvp_actions.labels(action_type=f"attack_{i%2}").inc(2 + i)
+    for i in range(3):
+        event_triggers.labels(event_type=f"event_{i}").inc(1)
+    for i in range(10):
+        api_response_time.labels(endpoint=f"/api/test_{i%2}").observe(0.1 + 0.05 * (i % 3))
+    for i in range(2):
+        api_errors.labels(endpoint=f"/api/test_{i}", error_type="timeout").inc(1)
+
+# Appelle cette fonction au démarrage (dev uniquement)
+if os.environ.get("INJECT_MOCK_METRICS", "1") == "1":
+    inject_mock_metrics()
