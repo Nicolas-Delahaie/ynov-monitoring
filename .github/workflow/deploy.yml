@@ -5,9 +5,6 @@ on:
       - deploy
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
   deploy_production:
     runs-on: ubuntu-latest
@@ -24,7 +21,7 @@ jobs:
       - name: Setup SSH Key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.RSA }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PRIVATE }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
 
@@ -39,7 +36,7 @@ jobs:
 
             docker compose pull
 
-            docker compose up -d --remove-orphans
+            docker compose up -d --remove-orphans --wait
 
             echo "Exposed services :"
             docker compose ps
