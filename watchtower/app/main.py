@@ -5,7 +5,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from contextlib import asynccontextmanager
 import logging
 import json
-from nats.aio.client import Client as NATS
+
 
 from app.config import settings
 from app.services.collector import GameplayCollector
@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 collector = GameplayCollector()
 scheduler = AsyncIOScheduler()
-nats_client = NATS()
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -29,10 +29,14 @@ async def lifespan(app: FastAPI):
     init_db()
     logger.info("Database initialized successfully!")
     
-    # Connexion à NATS
-    await nats_client.connect(servers=["wss://api.ccc.bzctoons.net/nats-ws"])
-    logger.info("Connected to NATS server!")
+
+    # Connexion à NATS gérée par NomadStatsService
+    from app.services.nomad_stats import NomadStatsService
+    nomad_stats_service = NomadStatsService()
+    await nomad_stats_service.connect_nats()
+    logger.info("Connected to NATS server (via NomadStatsService)!")
     
+
     # Démarrer le scheduler
     scheduler.add_job(
         scheduled_collection,
@@ -49,8 +53,7 @@ async def lifespan(app: FastAPI):
     scheduler.shutdown()
     # Fermer le client HTTP du collector
     await collector.client.aclose()
-    if nats_client.is_connected:
-        await nats_client.close()
+    await nomad_stats_service.close_nats()
     logger.info("Shutdown complete")
 
 app = FastAPI(
