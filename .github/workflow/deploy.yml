@@ -1,0 +1,50 @@
+name: Deploy on merge
+on:
+  push:
+    branches:
+      - deploy
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy_production:
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: http://monitor.nicolas-delahaie.fr
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+          ref: ${{ github.ref_name }}
+
+      - name: Setup SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.RSA }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Execution des commandes en SSH sur le serveur
+        run: |
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
+            set -e
+            cd /root/ynov-monitoring
+
+            git pull origin deploy
+
+            docker compose pull
+
+            docker compose up -d --remove-orphans
+
+            echo "Exposed services :"
+            docker compose ps
+          EOF
+
+      - name: Cleanup SSH Key
+        if: always()
+        run: rm -f ~/.ssh/id_rsa
