@@ -38,6 +38,8 @@ jobs:
 
             docker compose up -d --build --remove-orphans --wait
 
-            echo "Exposed services :"
+            docker image prune -f
+            
+            echo "Exposed services :"d
             docker compose ps
           EOF
